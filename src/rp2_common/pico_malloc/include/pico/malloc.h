@@ -35,4 +35,15 @@
 #define PICO_DEBUG_MALLOC_LOW_WATER 0
 #endif
 
+// PICO_CONFIG: PICO_REDIRECT_MALLOC, Allow redirecting malloc functions to custom implementations, type=bool, default=0, group=pico_malloc
+#ifndef PICO_REDIRECT_MALLOC
+#define PICO_REDIRECT_MALLOC 0
+#endif
+
+#if PICO_REDIRECT_MALLOC
+#define REDIRECT_MALLOC_FUNC(x) __redirect_ ## x
+#else
+#define REDIRECT_MALLOC_FUNC(x) REAL_FUNC(x) 
+#endif
+
 #endif

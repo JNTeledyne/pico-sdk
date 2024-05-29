@@ -17,10 +17,10 @@ auto_init_mutex(malloc_mutex);
 #include <stdio.h>
 #endif
 
-extern void *REAL_FUNC(malloc)(size_t size);
-extern void *REAL_FUNC(calloc)(size_t count, size_t size);
-extern void *REAL_FUNC(realloc)(void *mem, size_t size);
-extern void REAL_FUNC(free)(void *mem);
+extern void *REDIRECT_MALLOC_FUNC(malloc)(size_t size);
+extern void *REDIRECT_MALLOC_FUNC(calloc)(size_t count, size_t size);
+extern void *REDIRECT_MALLOC_FUNC(realloc)(void *mem, size_t size);
+extern void REDIRECT_MALLOC_FUNC(free)(void *mem);
 
 extern char __StackLimit; /* Set by linker.  */
 
@@ -36,7 +36,7 @@ void *WRAPPER_FUNC(malloc)(size_t size) {
 #if PICO_USE_MALLOC_MUTEX
     mutex_enter_blocking(&malloc_mutex);
 #endif
-    void *rc = REAL_FUNC(malloc)(size);
+    void *rc = REDIRECT_MALLOC_FUNC(malloc)(size);
 #if PICO_USE_MALLOC_MUTEX
     mutex_exit(&malloc_mutex);
 #endif
@@ -53,7 +53,7 @@ void *WRAPPER_FUNC(calloc)(size_t count, size_t size) {
 #if PICO_USE_MALLOC_MUTEX
     mutex_enter_blocking(&malloc_mutex);
 #endif
-    void *rc = REAL_FUNC(calloc)(count, size);
+    void *rc = REDIRECT_MALLOC_FUNC(calloc)(count, size);
 #if PICO_USE_MALLOC_MUTEX
     mutex_exit(&malloc_mutex);
 #endif
@@ -70,7 +70,7 @@ void *WRAPPER_FUNC(realloc)(void *mem, size_t size) {
 #if PICO_USE_MALLOC_MUTEX
     mutex_enter_blocking(&malloc_mutex);
 #endif
-    void *rc = REAL_FUNC(realloc)(mem, size);
+    void *rc = REDIRECT_MALLOC_FUNC(realloc)(mem, size);
 #if PICO_USE_MALLOC_MUTEX
     mutex_exit(&malloc_mutex);
 #endif
@@ -87,7 +87,7 @@ void WRAPPER_FUNC(free)(void *mem) {
 #if PICO_USE_MALLOC_MUTEX
     mutex_enter_blocking(&malloc_mutex);
 #endif
-    REAL_FUNC(free)(mem);
+    REDIRECT_MALLOC_FUNC(free)(mem);
 #if PICO_USE_MALLOC_MUTEX
     mutex_exit(&malloc_mutex);
 #endif
